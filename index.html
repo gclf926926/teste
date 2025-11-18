@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<title>Minha IA</title>
+<style>
+body {
+  background: #111;
+  color: #fff;
+  font-family: Arial;
+  padding: 20px;
+}
+input, textarea, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+button {
+  background: #4a8bff;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<h2>Minha IA</h2>
+
+<label>Sua API Key (fica só no navegador):</label>
+<input type="password" id="key" placeholder="sk-..." />
+
+<label>Pergunta:</label>
+<textarea id="msg" rows="3"></textarea>
+
+<button onclick="enviar()">Enviar</button>
+
+<h3>Resposta:</h3>
+<div id="resp"></div>
+
+<script>
+async function enviar() {
+  const key = document.getElementById("key").value;
+  const msg = document.getElementById("msg").value;
+  const respDiv = document.getElementById("resp");
+
+  respDiv.innerHTML = "Carregando...";
+
+  const resposta = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + key
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      input: msg
+    })
+  });
+
+  const data = await resposta.json();
+
+  try {
+    // A forma CORRETA de pegar o texto
+    const textoIA = data.output[0].content[0].text;
+    respDiv.innerHTML = textoIA;
+  } catch (e) {
+    respDiv.innerHTML = "Erro na resposta:<br><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+  }
+}
+</script>
+
+</body>
+</html>
